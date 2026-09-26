@@ -1,106 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Free online image compressor. Compress JPG, PNG and WebP images directly in your browser.">
-  <title>Image Compressor — Free Online Tool</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="logo" href="/">Image<span>Compress</span></a>
-      <a class="nav-link" href="#how-it-works">How it works</a>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero container">
-      <p class="eyebrow">100% browser-based</p>
-      <h1>Compress your images<br><span>for free.</span></h1>
-      <p class="hero-text">
-        Reduce JPG, PNG and WebP file sizes without uploading your images to a server.
-      </p>
-
-      <div class="tool-card">
-        <label class="drop-zone" id="dropZone" for="fileInput">
-          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp">
-          <div class="upload-icon">↑</div>
-          <h2>Drop an image here</h2>
-          <p>or <strong>choose a file</strong> from your device</p>
-          <small>JPG, PNG or WebP · Max 20 MB</small>
-        </label>
-
-        <div class="editor hidden" id="editor">
-          <div class="file-row">
-            <div>
-              <strong id="fileName">image.jpg</strong>
-              <span id="originalSize">0 KB</span>
-            </div>
-            <button class="text-button" id="resetBtn" type="button">Choose another</button>
-          </div>
-
-          <div class="preview-grid">
-            <div class="preview-box">
-              <span>Original</span>
-              <img id="originalPreview" alt="Original image preview">
-            </div>
-            <div class="preview-box">
-              <span>Compressed</span>
-              <img id="compressedPreview" alt="Compressed image preview">
-            </div>
-          </div>
-
-          <div class="controls">
-            <label for="quality">
-              <span>Quality</span>
-              <strong id="qualityValue">75%</strong>
-            </label>
-            <input id="quality" type="range" min="10" max="100" value="75">
-            <div class="range-labels"><span>Smaller file</span><span>Better quality</span></div>
-          </div>
-
-          <div class="result" id="result">
-            <div><span>New size</span><strong id="newSize">—</strong></div>
-            <div><span>Saved</span><strong id="saved">—</strong></div>
-            <button class="download-button" id="downloadBtn" type="button">Download image</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="features container" id="how-it-works">
-      <div>
-        <span class="feature-number">01</span>
-        <h3>Choose an image</h3>
-        <p>Select a JPG, PNG or WebP image from your device.</p>
-      </div>
-      <div>
-        <span class="feature-number">02</span>
-        <h3>Adjust quality</h3>
-        <p>Use the slider to balance file size and image quality.</p>
-      </div>
-      <div>
-        <span class="feature-number">03</span>
-        <h3>Download</h3>
-        <p>Your compressed image is generated directly in your browser.</p>
-      </div>
-    </section>
-
-    <section class="privacy container">
-      <h2>Your images stay on your device.</h2>
-      <p>This demo compresses images locally using your browser. No image upload is required.</p>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container footer-inner">
-      <span>© 2026 ImageCompress</span>
-      <span>Free online image compression</span>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Free online image, text, number and utility tools.">
+<title>QuickTools — Free Online Tools</title><link rel="stylesheet" href="style.css">
+</head><body>
+<header><div class="wrap nav"><a class="brand" href="#home">Quick<span>Tools</span></a>
+<nav><a href="#tools">Tools</a><a href="#about">About</a><a href="#contact">Contact</a></nav></div></header>
+<main>
+<section id="home" class="hero wrap"><p class="eyebrow">Free • Fast • Browser-based</p>
+<h1>Useful tools.<br><span>No signup required.</span></h1>
+<p>Simple tools for images, text, numbers and everyday tasks. Your files are processed locally in your browser.</p>
+<a class="primary" href="#tools">Explore tools</a></section>
+<section id="tools" class="wrap section"><p class="eyebrow">Toolbox</p><h2>Everything in one place</h2>
+<div class="tool-grid">
+<button class="tool-card" data-tool="compress"><b>🖼️ Image Compressor</b><span>Reduce image file size.</span></button>
+<button class="tool-card" data-tool="resize"><b>📏 Image Resizer</b><span>Change image dimensions.</span></button>
+<button class="tool-card" data-tool="convert"><b>🔄 Image Converter</b><span>Convert JPG, PNG and WebP.</span></button>
+<button class="tool-card" data-tool="words"><b>📝 Word Counter</b><span>Count words and characters.</span></button>
+<button class="tool-card" data-tool="percent"><b>🔢 Percentage Calculator</b><span>Calculate percentages quickly.</span></button>
+<button class="tool-card" data-tool="units"><b>📐 Unit Converter</b><span>Convert length and weight.</span></button>
+<button class="tool-card" data-tool="password"><b>🔐 Password Generator</b><span>Create random passwords.</span></button>
+</div></section>
+<section id="workspace" class="wrap section hidden"><div class="tool-panel">
+<button class="back" id="back">← All tools</button><h2 id="toolTitle">Tool</h2><p id="toolDescription" class="muted"></p><div id="toolContent"></div>
+</div></section>
+<section id="about" class="wrap info section"><p class="eyebrow">About</p><h2>Simple tools for everyday use.</h2><p>QuickTools is a lightweight collection of browser-based utilities designed to make common tasks quick and accessible.</p></section>
+<section id="contact" class="wrap info section"><p class="eyebrow">Contact</p><h2>Get in touch</h2><p>Replace this text with your real contact email before publishing.</p></section>
+<section id="privacy" class="wrap info section"><p class="eyebrow">Privacy</p><h2>Privacy Policy</h2><p>This starter site does not upload images for its browser tools. If you add analytics, advertising or forms, update this policy to explain what data those services collect.</p></section>
+<section id="terms" class="wrap info section"><p class="eyebrow">Terms</p><h2>Terms of Use</h2><p>These tools are provided for general utility purposes. Verify important results independently.</p></section>
+</main><footer><div class="wrap foot"><span>© 2026 QuickTools</span><span><a href="#privacy">Privacy</a> · <a href="#terms">Terms</a></span></div></footer>
+<script src="script.js"></script></body></html>

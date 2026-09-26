@@ -1,154 +1,19 @@
-const fileInput = document.getElementById("fileInput");
-const dropZone = document.getElementById("dropZone");
-const editor = document.getElementById("editor");
-const originalPreview = document.getElementById("originalPreview");
-const compressedPreview = document.getElementById("compressedPreview");
-const fileName = document.getElementById("fileName");
-const originalSize = document.getElementById("originalSize");
-const quality = document.getElementById("quality");
-const qualityValue = document.getElementById("qualityValue");
-const newSize = document.getElementById("newSize");
-const saved = document.getElementById("saved");
-const downloadBtn = document.getElementById("downloadBtn");
-const resetBtn = document.getElementById("resetBtn");
-
-let currentFile = null;
-let compressedBlob = null;
-let compressedUrl = null;
-let originalUrl = null;
-
-function formatBytes(bytes) {
-  if (!bytes) return "0 B";
-  const units = ["B", "KB", "MB", "GB"];
-  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-  return `${(bytes / Math.pow(1024, index)).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
-}
-
-function showEditor(file) {
-  currentFile = file;
-  fileName.textContent = file.name;
-  originalSize.textContent = formatBytes(file.size);
-
-  if (originalUrl) URL.revokeObjectURL(originalUrl);
-  originalUrl = URL.createObjectURL(file);
-  originalPreview.src = originalUrl;
-
-  dropZone.classList.add("hidden");
-  editor.classList.remove("hidden");
-
-  compressImage();
-}
-
-function compressImage() {
-  if (!currentFile) return;
-
-  const img = new Image();
-  const reader = new FileReader();
-
-  reader.onload = (event) => {
-    img.onload = () => {
-      const maxDimension = 2400;
-      const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
-      const width = Math.max(1, Math.round(img.width * scale));
-      const height = Math.max(1, Math.round(img.height * scale));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-
-      // JPEG gives predictable compression and works well for photos.
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-
-        compressedBlob = blob;
-
-        if (compressedUrl) URL.revokeObjectURL(compressedUrl);
-        compressedUrl = URL.createObjectURL(blob);
-        compressedPreview.src = compressedUrl;
-
-        const percentage = Math.max(
-          0,
-          Math.round((1 - blob.size / currentFile.size) * 100)
-        );
-
-        newSize.textContent = formatBytes(blob.size);
-        saved.textContent = `${percentage}%`;
-      }, "image/jpeg", Number(quality.value) / 100);
-    };
-
-    img.src = event.target.result;
-  };
-
-  reader.readAsDataURL(currentFile);
-}
-
-function handleFile(file) {
-  if (!file) return;
-
-  const allowed = ["image/jpeg", "image/png", "image/webp"];
-  if (!allowed.includes(file.type)) {
-    alert("Please choose a JPG, PNG or WebP image.");
-    return;
-  }
-
-  if (file.size > 20 * 1024 * 1024) {
-    alert("The maximum file size is 20 MB.");
-    return;
-  }
-
-  showEditor(file);
-}
-
-fileInput.addEventListener("change", () => {
-  handleFile(fileInput.files[0]);
-});
-
-quality.addEventListener("input", () => {
-  qualityValue.textContent = `${quality.value}%`;
-  clearTimeout(window.compressTimer);
-  window.compressTimer = setTimeout(compressImage, 120);
-});
-
-dropZone.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  dropZone.classList.add("dragover");
-});
-
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragover");
-});
-
-dropZone.addEventListener("drop", (event) => {
-  event.preventDefault();
-  dropZone.classList.remove("dragover");
-  handleFile(event.dataTransfer.files[0]);
-});
-
-resetBtn.addEventListener("click", () => {
-  fileInput.value = "";
-  currentFile = null;
-  compressedBlob = null;
-
-  if (originalUrl) URL.revokeObjectURL(originalUrl);
-  if (compressedUrl) URL.revokeObjectURL(compressedUrl);
-
-  originalUrl = null;
-  compressedUrl = null;
-
-  editor.classList.add("hidden");
-  dropZone.classList.remove("hidden");
-});
-
-downloadBtn.addEventListener("click", () => {
-  if (!compressedBlob) return;
-
-  const link = document.createElement("a");
-  link.href = compressedUrl;
-  link.download = `${currentFile.name.replace(/\.[^/.]+$/, "")}-compressed.jpg`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-});
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const workspace=$("#workspace"), content=$("#toolContent"), title=$("#toolTitle"), desc=$("#toolDescription");
+let currentFile=null,currentImg=null,outputBlob=null,outputUrl=null,originalUrl=null;
+const descriptions={compress:["Image Compressor","Reduce JPG, PNG or WebP images in your browser."],resize:["Image Resizer","Change image dimensions and download the result."],convert:["Image Converter","Convert an image to JPG, PNG or WebP."],words:["Word Counter","Count words, characters, lines and reading time."],percent:["Percentage Calculator","Calculate common percentage problems."],units:["Unit Converter","Convert length and weight units."],password:["Password Generator","Create a random password locally in your browser."]};
+function bytes(n){if(!n)return"0 B";let u=["B","KB","MB","GB"],i=Math.min(Math.floor(Math.log(n)/Math.log(1024)),3);return`${(n/1024**i).toFixed(i?1:0)} ${u[i]}`}
+$$(".tool-card").forEach(b=>b.onclick=()=>showTool(b.dataset.tool));
+$("#back").onclick=()=>{workspace.classList.add("hidden");location.hash="tools"};
+function showTool(t){title.textContent=descriptions[t][0];desc.textContent=descriptions[t][1];workspace.classList.remove("hidden");location.hash="workspace";
+if(["compress","resize","convert"].includes(t))imageTool(t);if(t==="words")wordTool();if(t==="percent")percentTool();if(t==="units")unitTool();if(t==="password")passwordTool()}
+function fileInput(){return`<label class="drop"><input id="toolFile" type="file" accept="image/jpeg,image/png,image/webp"><div><b>Click to choose an image</b><p class="muted">JPG, PNG or WebP · max 20 MB</p></div></label>`}
+function imageTool(type){let extra=type==="compress"?`<div class="field"><label>Quality: <span id="qv">75%</span></label><input id="quality" class="range" type="range" min="10" max="100" value="75"></div>`:type==="resize"?`<div class="row"><div class="field"><label>Width (px)</label><input id="w" class="input" type="number" min="1" placeholder="1200"></div><div class="field"><label>Height (px)</label><input id="h" class="input" type="number" min="1" placeholder="800"></div></div><label class="check"><input id="lock" type="checkbox" checked> Keep aspect ratio</label>`:`<div class="field"><label>Output format</label><select id="format" class="input"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></div>`;
+content.innerHTML=fileInput()+extra+`<div id="previewArea"></div><div id="result"></div>`;$("#toolFile").onchange=e=>loadImage(e.target.files[0],type);
+if($("#quality"))$("#quality").oninput=e=>{$("#qv").textContent=e.target.value+"%";if(currentFile)processImage(type)};if($("#w")){$("#w").oninput=()=>processImage(type);$("#h").oninput=()=>processImage(type)}if($("#format"))$("#format").onchange=()=>processImage(type)}
+function loadImage(file,type){if(!file)return;if(file.size>20*1024*1024)return alert("Maximum file size is 20 MB.");if(!["image/jpeg","image/png","image/webp"].includes(file.type))return alert("Please choose JPG, PNG or WebP.");currentFile=file;if(originalUrl)URL.revokeObjectURL(originalUrl);originalUrl=URL.createObjectURL(file);let img=new Image();img.onload=()=>{currentImg=img;if($("#w")){$("#w").value=img.width;$("#h").value=img.height}processImage(type)};img.src=originalUrl}
+function processImage(type){if(!currentImg)return;let w=currentImg.width,h=currentImg.height;if(type==="resize"){w=Math.max(1,parseInt($("#w").value)||w);h=Math.max(1,parseInt($("#h").value)||h)}else{let s=Math.min(1,2400/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s)}let c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(currentImg,0,0,w,h);let mime=type==="convert"?$("#format").value:"image/jpeg",q=type==="compress"?Number($("#quality").value)/100:.9;if(type==="resize"&&currentFile.type==="image/png")mime="image/png";c.toBlob(blob=>{outputBlob=blob;if(outputUrl)URL.revokeObjectURL(outputUrl);outputUrl=URL.createObjectURL(blob);$("#previewArea").innerHTML=`<img class="preview" src="${outputUrl}" alt="Preview">`;let saved=Math.max(0,Math.round((1-blob.size/currentFile.size)*100));$("#result").innerHTML=`<div class="output"><b>${bytes(blob.size)}</b> output · ${saved}% smaller<div class="actions"><button class="download" id="dl">Download image</button></div></div>`;$("#dl").onclick=()=>{let ext=blob.type.split("/")[1].replace("jpeg","jpg"),a=document.createElement("a");a.href=outputUrl;a.download=currentFile.name.replace(/\.[^.]+$/,"")+"-converted."+ext;a.click()}},mime,q)}
+function wordTool(){content.innerHTML=`<textarea id="text" rows="14" class="input" placeholder="Paste or type your text here..."></textarea><div class="row"><div class="output"><span>Words</span><div id="wc" class="big">0</div></div><div class="output"><span>Characters</span><div id="cc" class="big">0</div></div></div><div class="row"><div class="output"><span>Lines</span><div id="lc" class="big">0</div></div><div class="output"><span>Reading time</span><div id="rt" class="big">0 min</div></div></div>`;$("#text").oninput=e=>{let t=e.target.value,w=t.trim()?t.trim().split(/\s+/).length:0;$("#wc").textContent=w;$("#cc").textContent=t.length;$("#lc").textContent=t?t.split(/\r?\n/).length:0;$("#rt").textContent=Math.ceil(w/200)+" min"}}
+function percentTool(){content.innerHTML=`<div class="row"><div class="field"><label>Percentage</label><input id="pa" class="input" type="number" value="20"></div><div class="field"><label>Of</label><input id="pb" class="input" type="number" value="100"></div></div><button class="download" id="calc">Calculate</button><div id="pout" class="output hidden"></div>`;$("#calc").onclick=()=>{$("#pout").classList.remove("hidden");$("#pout").innerHTML=`<div class="big">${(Number($("#pa").value)/100*Number($("#pb").value)).toLocaleString()}</div>`}}
+function unitTool(){content.innerHTML=`<div class="row"><div class="field"><label>Category</label><select id="cat" class="input"><option value="length">Length</option><option value="weight">Weight</option></select></div><div class="field"><label>Value</label><input id="uv" class="input" type="number" value="1"></div></div><div class="row"><div class="field"><label>From</label><select id="uf" class="input"></select></div><div class="field"><label>To</label><select id="ut" class="input"></select></div></div><button class="download" id="uc">Convert</button><div id="uo" class="output hidden"></div>`;let maps={length:{m:{meter:1,kilometer:1000,centimeter:.01,mile:1609.344,foot:.3048},n:["meter","kilometer","centimeter","mile","foot"]},weight:{m:{kilogram:1,gram:.001,pound:.45359237,ounce:.0283495},n:["kilogram","gram","pound","ounce"]}};function fill(){let d=maps[$("#cat").value];$("#uf").innerHTML=d.n.map(x=>`<option>${x}</option>`).join("");$("#ut").innerHTML=d.n.map(x=>`<option>${x}</option>`).join("")}$("#cat").onchange=fill;fill();$("#uc").onclick=()=>{let d=maps[$("#cat").value],v=Number($("#uv").value)*d.m[$("#uf").value]/d.m[$("#ut").value];$("#uo").classList.remove("hidden");$("#uo").innerHTML=`<div class="big">${v.toLocaleString(undefined,{maximumFractionDigits:8})} ${$("#ut").value}</div>`}}
+function passwordTool(){content.innerHTML=`<div class="field"><label>Length: <span id="plv">16</span></label><input id="pl" class="range" type="range" min="6" max="64" value="16"></div><label class="check"><input id="upper" type="checkbox" checked> Uppercase</label><label class="check"><input id="num" type="checkbox" checked> Numbers</label><label class="check"><input id="sym" type="checkbox" checked> Symbols</label><div class="output"><input id="pass" class="input" readonly></div><button class="download" id="gen">Generate</button><button class="download" id="copy">Copy</button>`;const gen=()=>{let s="abcdefghijklmnopqrstuvwxyz";if($("#upper").checked)s+="ABCDEFGHIJKLMNOPQRSTUVWXYZ";if($("#num").checked)s+="0123456789";if($("#sym").checked)s+="!@#$%^&*()-_=+";let o="";for(let i=0;i<+$("#pl").value;i++)o+=s[Math.floor(Math.random()*s.length)];$("#pass").value=o};$("#pl").oninput=e=>{$("#plv").textContent=e.target.value;gen()};$("#gen").onclick=gen;$("#copy").onclick=()=>navigator.clipboard?.writeText($("#pass").value);gen()}

@@ -1,25 +1,10 @@
-# ImageCompress
+# QuickTools
+A static collection of browser-based tools.
 
-A simple, responsive image compressor that runs entirely in the browser.
+Included: Image Compressor, Image Resizer, Image Converter, Word Counter, Percentage Calculator, Unit Converter, Password Generator, About, Contact, Privacy and Terms.
 
-## Files
-
-- `index.html` — page structure
-- `style.css` — design and responsive layout
-- `script.js` — image compression logic
-
-## Run locally
-
-Open `index.html` in a browser. No server, database, Node.js, or VPS is required.
-
-## Publish
-
-You can upload these files to a static hosting provider such as Vercel, Netlify, or GitHub Pages.
+## Update your existing Vercel project
+Replace `index.html`, `style.css`, and `script.js` in your GitHub repository with these files. Vercel should automatically deploy the new commit.
 
 ## Before AdSense
-
-This is an MVP tool. Before applying for or placing AdSense, add useful original content and the standard pages appropriate for your site, such as Privacy Policy, Terms, and Contact, and make sure the site follows Google's current publisher policies.
-
-## Note
-
-The compressor converts output to JPEG. Transparent PNG backgrounds therefore will not remain transparent.
+This is an MVP. Add original useful content, a real contact method, a proper privacy policy, and comply with Google's current publisher policies before applying for or displaying AdSense.
